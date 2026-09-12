@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Req,
   UploadedFile,
   UseInterceptors,
@@ -17,6 +18,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 
 import { CreateRentalDto } from './dto/create-rental.dto';
+import { UpdateRentalDto } from './dto/update-rental.dto';
 import { RentalsService } from './rentals.service';
 
 type AuthenticatedRequest = Request & {
@@ -63,7 +65,7 @@ export class RentalsController {
       throw new BadRequestException('Picture is required');
     }
 
-    // Construit l'URL qui sera enregistrée dans la base.
+    // Construit l'URL enregistrée en base.
     const pictureUrl =
       `${request.protocol}://${request.get('host')}` +
       `/uploads/${picture.filename}`;
@@ -73,5 +75,34 @@ export class RentalsController {
       pictureUrl,
       request.user.userId,
     );
+  }
+
+  @Put(':id')
+  @UseInterceptors(
+    FileInterceptor('picture', {
+      storage: diskStorage({
+        destination: 'uploads',
+
+        filename: (_request, file, callback) => {
+          // Génère un nouveau nom uniquement si une image est envoyée.
+          const extension = extname(file.originalname);
+
+          callback(null, `${randomUUID()}${extension}`);
+        },
+      }),
+    }),
+  )
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateRentalDto: UpdateRentalDto,
+    @UploadedFile() picture: Express.Multer.File | undefined,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    // Si aucune image n'est envoyée, l'ancienne URL reste inchangée.
+    const pictureUrl = picture
+      ? `${request.protocol}://${request.get('host')}/uploads/${picture.filename}`
+      : undefined;
+
+    return this.rentalsService.update(id, updateRentalDto, pictureUrl);
   }
 }

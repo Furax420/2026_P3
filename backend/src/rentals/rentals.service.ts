@@ -4,6 +4,7 @@ import type { Prisma } from '../../generated/prisma/client';
 import { CreateRentalDto } from './dto/create-rental.dto';
 import { RentalResponseDto } from './dto/rental-response.dto';
 import { RentalsRepository } from './rentals.repository';
+import { UpdateRentalDto } from './dto/update-rental.dto';
 
 type RentalWithOwner = Prisma.rentalsGetPayload<{
   include: {
@@ -49,6 +50,29 @@ export class RentalsService {
 
     return {
       message: 'Rental created!',
+    };
+  }
+
+  async update(
+    id: number,
+    updateRentalDto: UpdateRentalDto,
+    pictureUrl?: string,
+  ): Promise<{ message: string }> {
+    const rental = await this.rentalsRepository.findById(id);
+
+    if (!rental) {
+      throw new NotFoundException('Rental not found');
+    }
+
+    const data = {
+      ...updateRentalDto,
+      ...(pictureUrl ? { picture: pictureUrl } : {}),
+    };
+
+    await this.rentalsRepository.update(id, data);
+
+    return {
+      message: 'Rental updated!',
     };
   }
 

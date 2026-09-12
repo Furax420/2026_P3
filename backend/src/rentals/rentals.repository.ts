@@ -2,6 +2,14 @@ import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 
+type UpdateRentalData = {
+  name?: string;
+  surface?: number;
+  price?: number;
+  picture?: string;
+  description?: string;
+};
+
 @Injectable()
 export class RentalsRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -47,6 +55,17 @@ export class RentalsRepository {
           },
         },
       },
+      include: {
+        users: true,
+      },
+    });
+  }
+
+  update(id: number, data: UpdateRentalData) {
+    // Modifie uniquement les champs présents dans data.
+    return this.prisma.rentals.update({
+      where: { id },
+      data,
       include: {
         users: true,
       },

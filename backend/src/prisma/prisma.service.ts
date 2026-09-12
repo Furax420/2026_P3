@@ -23,6 +23,7 @@ export class PrismaService
       password: decodeURIComponent(url.password),
       database: url.pathname.replace(/^\//, ''),
       connectionLimit: 5,
+      allowPublicKeyRetrieval: true,
     });
 
     // PrismaClient utilisera cet adapter pour communiquer avec MySQL.

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '../../generated/prisma/client';
 
+import { CreateRentalDto } from './dto/create-rental.dto';
 import { RentalResponseDto } from './dto/rental-response.dto';
 import { RentalsRepository } from './rentals.repository';
 
@@ -32,7 +33,26 @@ export class RentalsService {
     return this.toResponseDto(rental);
   }
 
-  // Transforme la donnée Prisma en réponse adaptée au contrat de l'API.
+  async create(
+    createRentalDto: CreateRentalDto,
+    pictureUrl: string,
+    ownerId: number,
+  ): Promise<{ message: string }> {
+    await this.rentalsRepository.create(
+      createRentalDto.name,
+      createRentalDto.surface,
+      createRentalDto.price,
+      pictureUrl,
+      createRentalDto.description,
+      ownerId,
+    );
+
+    return {
+      message: 'Rental created!',
+    };
+  }
+
+  // Transforme la donnée Prisma vers le format attendu par le frontend.
   private toResponseDto(rental: RentalWithOwner): RentalResponseDto {
     return {
       id: rental.id,

@@ -13,7 +13,9 @@ async function bootstrap() {
 
   // Autorise le frontend React à appeler le backend.
   app.enableCors({
-    origin: 'http://localhost:5174',
+    origin: ['http://localhost:5173', 'http://localhost:5174'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   // Valide automatiquement les données reçues à partir des DTO.

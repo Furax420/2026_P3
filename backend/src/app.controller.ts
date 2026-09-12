@@ -9,4 +9,10 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  // Route temporaire de vérification de la connexion à la base.
+  @Get('db-test')
+  checkDatabase() {
+    return this.appService.checkDatabase();
+  }
 }

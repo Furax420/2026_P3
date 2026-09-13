@@ -16,21 +16,31 @@ type UpdateRentalData = {
 export class RentalsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Récupère toutes les locations avec l'utilisateur propriétaire associé.
+  // Récupère toutes les locations avec uniquement les infos utiles du propriétaire.
   findAll() {
     return this.prisma.rentals.findMany({
       include: {
-        users: true,
+        users: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
   }
 
-  // Récupère une location précise avec son propriétaire.
+  // Récupère une location précise avec uniquement les infos utiles du propriétaire.
   findById(id: number) {
     return this.prisma.rentals.findUnique({
       where: { id },
       include: {
-        users: true,
+        users: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
   }
@@ -59,9 +69,6 @@ export class RentalsRepository {
           },
         },
       },
-      include: {
-        users: true,
-      },
     });
   }
 
@@ -70,9 +77,6 @@ export class RentalsRepository {
     return this.prisma.rentals.update({
       where: { id },
       data,
-      include: {
-        users: true,
-      },
     });
   }
 }

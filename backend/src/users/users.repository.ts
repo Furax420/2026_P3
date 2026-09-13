@@ -18,6 +18,13 @@ export class UsersRepository {
   findById(id: number) {
     return this.prisma.users.findUnique({
       where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        created_at: true,
+        updated_at: true,
+      },
     });
   }
 

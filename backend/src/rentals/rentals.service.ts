@@ -6,10 +6,15 @@ import { RentalResponseDto } from './dto/rental-response.dto';
 import { UpdateRentalDto } from './dto/update-rental.dto';
 import { RentalsRepository } from './rentals.repository';
 
-// Type Prisma exact d'une rental avec sa relation users chargée.
+// Type Prisma exact d'une rental avec uniquement id et name du propriétaire.
 type RentalWithOwner = Prisma.rentalsGetPayload<{
   include: {
-    users: true;
+    users: {
+      select: {
+        id: true;
+        name: true;
+      };
+    };
   };
 }>;
 

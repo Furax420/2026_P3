@@ -21,17 +21,16 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { randomUUID } from 'crypto';
 import type { Request } from 'express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 
 import { CreateRentalDto } from './dto/create-rental.dto';
 import { RentalResponseDto } from './dto/rental-response.dto';
 import { UpdateRentalDto } from './dto/update-rental.dto';
+import { rentalPictureUploadOptions } from './rental-upload.config';
 import { RentalsService } from './rentals.service';
 
 // Express ne connaît pas par défaut la propriété user ajoutée par JwtStrategy.
@@ -123,6 +122,7 @@ export class RentalsController {
         picture: {
           type: 'string',
           format: 'binary',
+          description: 'Image JPEG, PNG ou WEBP - 5 Mo maximum',
         },
       },
     },
@@ -131,25 +131,16 @@ export class RentalsController {
     description: 'Location créée.',
   })
   @ApiBadRequestResponse({
-    description: 'Données invalides ou image absente.',
+    description: 'Données invalides, image absente ou format non autorisé.',
+  })
+  @ApiResponse({
+    status: 413,
+    description: 'Image trop volumineuse (5 Mo maximum).',
   })
   @ApiUnauthorizedResponse({
     description: 'JWT absent ou invalide.',
   })
-  @UseInterceptors(
-    FileInterceptor('picture', {
-      storage: diskStorage({
-        // Multer enregistre physiquement le fichier dans backend/uploads.
-        destination: 'uploads',
-
-        filename: (_request, file, callback) => {
-          // UUID évite d'écraser deux fichiers qui auraient le même nom d'origine.
-          const extension = extname(file.originalname);
-          callback(null, `${randomUUID()}${extension}`);
-        },
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('picture', rentalPictureUploadOptions))
   create(
     // Champs texte/nombre du formulaire.
     @Body() createRentalDto: CreateRentalDto,
@@ -207,6 +198,7 @@ export class RentalsController {
         picture: {
           type: 'string',
           format: 'binary',
+          description: 'Image JPEG, PNG ou WEBP - 5 Mo maximum',
         },
       },
     },
@@ -218,23 +210,16 @@ export class RentalsController {
     description: 'Location introuvable.',
   })
   @ApiBadRequestResponse({
-    description: 'Données invalides.',
+    description: 'Données invalides ou format d’image non autorisé.',
+  })
+  @ApiResponse({
+    status: 413,
+    description: 'Image trop volumineuse (5 Mo maximum).',
   })
   @ApiUnauthorizedResponse({
     description: 'JWT absent ou invalide.',
   })
-  @UseInterceptors(
-    FileInterceptor('picture', {
-      storage: diskStorage({
-        destination: 'uploads',
-
-        filename: (_request, file, callback) => {
-          const extension = extname(file.originalname);
-          callback(null, `${randomUUID()}${extension}`);
-        },
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('picture', rentalPictureUploadOptions))
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateRentalDto: UpdateRentalDto,

@@ -8,6 +8,7 @@ Documentation Swagger : http://localhost:3001/api-docs
 Routes publiques :
 - POST /auth/register
 - POST /auth/login
+- Documentation Swagger /api-docs
 
 Toutes les autres routes métier nécessitent un JWT valide.
 
@@ -15,16 +16,19 @@ Toutes les autres routes métier nécessitent un JWT valide.
 1. POST /api/auth/register
 --------------------------
 But : créer un utilisateur.
+
 Body JSON :
 {
   "name": "Tristan",
   "email": "tristan@example.com",
   "password": "motdepasse"
 }
+
 Succès : 200 OK
 {
   "token": "<jwt>"
 }
+
 Erreurs :
 - 400 si email déjà utilisé ou données invalides.
 
@@ -32,15 +36,18 @@ Erreurs :
 2. POST /api/auth/login
 -----------------------
 But : authentifier un utilisateur existant.
+
 Body JSON :
 {
   "email": "tristan@example.com",
   "password": "motdepasse"
 }
+
 Succès : 200 OK
 {
   "token": "<jwt>"
 }
+
 Erreurs :
 - 401 si identifiants invalides.
 
@@ -48,7 +55,9 @@ Erreurs :
 3. GET /api/auth/me
 -------------------
 But : récupérer l'utilisateur correspondant au JWT courant.
+
 JWT obligatoire.
+
 Succès : 200 OK
 {
   "id": 1,
@@ -57,6 +66,9 @@ Succès : 200 OK
   "created_at": "2026-09-13T10:00:00.000Z",
   "updated_at": "2026-09-13T10:00:00.000Z"
 }
+
+Le password n'est jamais renvoyé.
+
 Erreurs :
 - 401 si JWT absent, invalide ou utilisateur introuvable.
 
@@ -64,26 +76,29 @@ Erreurs :
 4. GET /api/rentals
 -------------------
 But : récupérer toutes les locations.
+
 JWT obligatoire.
+
 Succès : 200 OK
 {
   "rentals": [
     {
       "id": 1,
-      "name": "Appartement Paris",
-      "surface": 50,
-      "price": 1200,
+      "name": "Appartement Dijon",
+      "surface": 65,
+      "price": 950,
       "picture": "http://localhost:3001/uploads/image.jpg",
-      "description": "Bel appartement",
+      "description": "Appartement proche du centre",
       "owner": {
         "id": 1,
-        "name": "Patrick"
+        "name": "Tristan"
       },
-      "created_at": "2024-01-01T00:00:00Z",
-      "updated_at": "2024-01-01T00:00:00Z"
+      "created_at": "2026-09-13T10:00:00.000Z",
+      "updated_at": "2026-09-13T10:00:00.000Z"
     }
   ]
 }
+
 Erreurs :
 - 401 si JWT absent ou invalide.
 
@@ -91,9 +106,13 @@ Erreurs :
 5. GET /api/rentals/:id
 -----------------------
 But : récupérer une location par son identifiant.
+
 JWT obligatoire.
 Paramètre : id numérique.
-Succès : 200 OK, objet rental au même format que ci-dessus.
+
+Succès : 200 OK
+Objet rental au même format que dans GET /api/rentals.
+
 Erreurs :
 - 400 si l'id n'est pas numérique.
 - 401 si JWT absent ou invalide.
@@ -103,67 +122,88 @@ Erreurs :
 6. POST /api/rentals
 --------------------
 But : créer une nouvelle location.
+
 JWT obligatoire.
 Content-Type : multipart/form-data
+
 Champs :
 - name : string, obligatoire
-- surface : number, positif, obligatoire
-- price : number, positif, obligatoire
+- surface : number positif, obligatoire
+- price : number positif, obligatoire
 - description : string, obligatoire
 - picture : fichier, obligatoire
 
-Le owner_id n'est pas envoyé par le client : il est déterminé depuis le JWT.
-Le fichier est stocké sur le serveur et son URL est enregistrée dans RENTALS.picture.
+Image :
+- JPEG, PNG ou WEBP uniquement
+- 5 Mo maximum
+- nom de fichier généré automatiquement avec un UUID
+
+Le owner_id n'est pas envoyé par le client :
+il est déterminé depuis request.user.userId, lui-même issu du JWT.
+
+Le fichier est stocké dans backend/uploads.
+Seule son URL publique est enregistrée dans RENTALS.picture.
 
 Succès : 201 Created
 {
   "message": "Rental created!"
 }
+
 Erreurs :
-- 400 si données invalides ou image absente.
+- 400 si données invalides, image absente ou format non autorisé.
 - 401 si JWT absent ou invalide.
+- 413 si l'image dépasse 5 Mo.
 
 
 7. PUT /api/rentals/:id
 -----------------------
 But : modifier une location existante.
+
 JWT obligatoire.
 Content-Type : multipart/form-data
 Paramètre : id numérique.
+
 Champs facultatifs :
 - name
 - surface
 - price
 - description
-- picture (nouvelle image facultative)
+- picture
 
-Seuls les champs envoyés sont modifiés.
 Si aucune nouvelle image n'est envoyée, l'ancienne URL reste inchangée.
+Une nouvelle image respecte les mêmes règles que lors de la création :
+JPEG / PNG / WEBP, 5 Mo maximum.
 
 Succès : 200 OK
 {
   "message": "Rental updated!"
 }
+
 Erreurs :
-- 400 si id/données invalides.
+- 400 si id/données invalides ou format d'image non autorisé.
 - 401 si JWT absent ou invalide.
 - 404 si la location n'existe pas.
+- 413 si l'image dépasse 5 Mo.
 
 
 8. GET /api/user/:id
 --------------------
 But : récupérer un utilisateur par son identifiant.
+
 JWT obligatoire.
 Paramètre : id numérique.
+
 Succès : 200 OK
 {
   "id": 1,
   "name": "John Doe",
   "email": "john@example.com",
-  "created_at": "2024-01-01T00:00:00Z",
-  "updated_at": "2024-01-01T00:00:00Z"
+  "created_at": "2026-09-13T10:00:00.000Z",
+  "updated_at": "2026-09-13T10:00:00.000Z"
 }
+
 Le password n'est jamais exposé.
+
 Erreurs :
 - 400 si l'id n'est pas numérique.
 - 401 si JWT absent ou invalide.
@@ -173,25 +213,31 @@ Erreurs :
 9. POST /api/messages
 ---------------------
 But : enregistrer un message lié à une location et un utilisateur.
+
 JWT obligatoire.
+
 Body JSON :
 {
   "rental_id": 1,
   "user_id": 2,
   "message": "Bonjour, cette location est-elle toujours disponible ?"
 }
+
 Succès : 200 OK
 {
   "message": "Message sent!"
 }
+
 Erreurs :
-- 400 si données invalides, rental inexistante ou user inexistant.
+- 400 si les données sont invalides, si la rental n'existe pas ou si le user n'existe pas.
 - 401 si JWT absent ou invalide.
 
 
-ROUTES TECHNIQUES TEMPORAIRES
------------------------------
-Le code contient encore les routes de starter / test :
-- GET /api
-- GET /api/db-test
-Elles ne font pas partie du contrat Mockoon et peuvent être retirées avant livraison finale.
+RESUME SECURITE
+---------------
+- Toutes les routes métier sont protégées par JWT.
+- Seuls register, login et Swagger sont publics.
+- Les passwords sont hashés avec bcrypt.
+- Les réponses utilisateur n'exposent jamais le password.
+- DATABASE_URL et JWT_SECRET sont lus depuis les variables d'environnement.
+- Les images sont contrôlées avant stockage.

@@ -12,9 +12,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
+    // AuthService passe par UsersService pour lire/créer les utilisateurs.
     UsersModule,
+
+    // Passport fournit le mécanisme de stratégie utilisé par JwtStrategy.
     PassportModule,
 
+    // JwtService signe les tokens avec JWT_SECRET du .env.
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -25,9 +29,12 @@ import { JwtStrategy } from './strategies/jwt.strategy';
   controllers: [AuthController],
   providers: [
     AuthService,
+
+    // Explique à Passport comment lire et vérifier un Bearer JWT.
     JwtStrategy,
 
-    // Toutes les routes utilisent désormais JwtAuthGuard par défaut sans avoir à l'ajouter manuellement à chaques nouvelles routes
+    // Applique JwtAuthGuard à toutes les routes par défaut.
+    // Les routes @Public() sont les exceptions.
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

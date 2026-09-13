@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 
+// Forme des champs que Prisma peut recevoir lors d'une modification partielle.
 type UpdateRentalData = {
   name?: string;
   surface?: number;
@@ -10,12 +11,13 @@ type UpdateRentalData = {
   description?: string;
 };
 
+// Repository = seul endroit du module Rentals qui exécute directement les requêtes Prisma.
 @Injectable()
 export class RentalsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  // Récupère toutes les locations avec l'utilisateur propriétaire associé.
   findAll() {
-    // Utilisé pour la route GET de l'accueil.
     return this.prisma.rentals.findMany({
       include: {
         users: true,
@@ -23,8 +25,8 @@ export class RentalsRepository {
     });
   }
 
+  // Récupère une location précise avec son propriétaire.
   findById(id: number) {
-    // Utilisé pour les pages dynamiques de chaque location.
     return this.prisma.rentals.findUnique({
       where: { id },
       include: {
@@ -33,6 +35,7 @@ export class RentalsRepository {
     });
   }
 
+  // Crée une location et la rattache à l'utilisateur connecté.
   create(
     name: string,
     surface: number,
@@ -41,7 +44,6 @@ export class RentalsRepository {
     description: string,
     ownerId: number,
   ) {
-    // Crée une location et la rattache à l'utilisateur connecté.
     return this.prisma.rentals.create({
       data: {
         name,
@@ -49,6 +51,8 @@ export class RentalsRepository {
         price,
         picture,
         description,
+
+        // Prisma remplit owner_id grâce à la relation users -> id.
         users: {
           connect: {
             id: ownerId,
@@ -61,8 +65,8 @@ export class RentalsRepository {
     });
   }
 
+  // Prisma ne modifie que les propriétés réellement présentes dans data.
   update(id: number, data: UpdateRentalData) {
-    // Modifie uniquement les champs présents dans data.
     return this.prisma.rentals.update({
       where: { id },
       data,

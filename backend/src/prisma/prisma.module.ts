@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 
+// Rend PrismaService injectable dans les autres modules qui importent PrismaModule.
 @Module({
-  // PrismaService peut être injecté dans les classes de ce module.
+  // Nest crée et gère l'instance de PrismaService.
   providers: [PrismaService],
 
-  // On l'exporte pour pouvoir aussi l'utiliser dans les autres modules de l'application.
+  // Export nécessaire pour UsersModule, RentalsModule et MessagesModule.
   exports: [PrismaService],
 })
 export class PrismaModule {}

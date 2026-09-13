@@ -5,11 +5,12 @@ import { PrismaService } from './prisma/prisma.service';
 export class AppService {
   constructor(private readonly prisma: PrismaService) {}
 
+  // Réponse de démonstration du starter NestJS.
   getHello(): string {
     return 'Hello World!';
   }
 
-  // Test temporaire pour vérifier l'accès à MySQL depuis NestJS.
+  // Test temporaire : si count() répond, Prisma communique bien avec MySQL.
   async checkDatabase() {
     const userCount = await this.prisma.users.count();
 

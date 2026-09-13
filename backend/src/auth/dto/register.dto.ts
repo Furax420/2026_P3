@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
+// Décrit et valide le JSON attendu par POST /api/auth/register.
 export class RegisterDto {
   @ApiProperty({
     example: 'Tristan',

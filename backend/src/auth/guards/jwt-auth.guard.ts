@@ -4,6 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
+// Guard global : par défaut une route doit avoir un JWT valide.
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(private readonly reflector: Reflector) {
@@ -11,18 +12,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   canActivate(context: ExecutionContext) {
-    // Cherche si @Public() est présent sur la route ou le controller.
+    // Cherche la metadata posée par @Public() sur la route ou le controller.
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
 
-    // Une route publique ne passe pas par la vérification JWT.
+    // Une route publique contourne volontairement la vérification JWT.
     if (isPublic) {
       return true;
     }
 
-    // Sinon Passport vérifie le JWT avec JwtStrategy.
+    // Sinon AuthGuard('jwt') déclenche JwtStrategy via Passport.
     return super.canActivate(context);
   }
 }

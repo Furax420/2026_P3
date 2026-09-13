@@ -5,6 +5,7 @@ import { MessagesController } from './messages.controller';
 import { MessagesRepository } from './messages.repository';
 import { MessagesService } from './messages.service';
 
+// Assemble la chaîne Controller -> Service -> Repository pour les messages.
 @Module({
   imports: [PrismaModule],
   controllers: [MessagesController],

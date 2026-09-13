@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+// Forme publique d'un utilisateur renvoyée par l'API : aucun password ici.
 export class UserResponseDto {
   @ApiProperty({
     example: 1,

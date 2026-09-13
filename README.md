@@ -23,7 +23,7 @@ Votre mission : **Implémenter l'API REST avec NestJS** qui remplacera l'API moc
 
 ```bash
 git clone <url-du-repo>
-cd p3-dfsjs-starter
+cd LDJS-Mod-lisez-et-impl-mentez-le-back-end-en-utilisant-du-code-NestJS-maintenable
 ```
 
 #### 2. Installer et lancer le front-end React
@@ -53,181 +53,200 @@ mysql -u root -p < ressources/sql/schema.sql
 ```
 
 Ou via MySQL Workbench / DBeaver :
+
 1. Ouvrir le fichier `ressources/sql/schema.sql`
 2. Exécuter le script
 
-## 📂 Structure du projet
+#### 3. Installer et lancer le back-end NestJS
 
-```
-p3-dfsjs-starter/
-├── frontend/                # Application React 19 (déjà complète)
-│   ├── src/
-│   │   ├── components/     # Composants réutilisables
-│   │   ├── pages/          # Pages de l'application
-│   │   ├── services/       # Services API (axios)
-│   │   ├── types/          # Types TypeScript
-│   │   └── App.tsx
-│   ├── package.json
-│   └── vite.config.ts
-│
-├── ressources/
-│   ├── mockoon/           # Environnement Mockoon
-│   │   └── chatop-api.json
-│   └── sql/               # Schéma de base de données
-│       └── schema.sql
-│
-└── README.md
+## Installation
+
+Depuis le dossier `backend` :
+
+```bash
+npm install
 ```
 
-## 🎯 Votre mission
+## Configuration
 
-### Exercice 1 : Modélisation (3 étapes)
+Créer un fichier `.env` à partir du fichier `.env.example`.
 
-1. **Installer l'environnement** :
-   - Installer Mockoon
-   - Lancer le front-end React
-   - Tester l'application avec Mockoon
+Exemple :
 
-2. **Analyser l'API Mockoon** :
-   - Identifier toutes les routes de l'API
-   - Documenter : URL, méthode HTTP, paramètres, body, réponses
-   - Identifier les entités métier (User, Rental, Message)
+```env
+DATABASE_URL="mysql://USER:PASSWORD@localhost:3306/chatop_db"
+JWT_SECRET="your-secret-key"
+PORT=3001
+```
 
-3. **Initialiser la base de données** :
-   - Créer la base `chatop_db`
-   - Exécuter le schéma SQL fourni
-   - Configurer Prisma (à faire lors de l'implémentation)
+Le fichier `.env` contient les vraies informations de connexion et ne doit pas être versionné.
 
-### Exercice 2 : Implémentation (3 étapes)
+## Base de données -> Prisma
 
-Vous devrez créer un back-end NestJS de zéro avec :
+Une fois la base créée, Prisma peut récupérer sa structure avec :
 
-1. **Routes d'authentification** :
-   - `POST /api/auth/register` - Créer un compte
-   - `POST /api/auth/login` - Se connecter (retour JWT)
-   - `GET /api/auth/me` - Obtenir l'utilisateur connecté
-   - Chiffrement des mots de passe (bcrypt)
-   - Sécurisation JWT (toutes routes sauf register/login/swagger)
+```bash
+npx prisma db pull
+```
 
-2. **Toutes les routes API** :
-   - `GET /api/rentals` - Liste des locations
-   - `GET /api/rentals/:id` - Détail d'une location
-   - `POST /api/rentals` - Créer une location (avec upload image)
-   - `PUT /api/rentals/:id` - Modifier une location
-   - `GET /api/user/:id` - Obtenir un utilisateur
-   - `POST /api/messages` - Envoyer un message
-   - Architecture Controller/Service/Repository (Prisma)
-   - Validation des DTOs (class-validator)
+Puis générer le client Prisma :
 
-3. **Documentation et finalisation** :
-   - Documenter avec Swagger (@nestjs/swagger)
-   - Nettoyer le code
-   - README complet du back-end
+```bash
+npx prisma generate
+```
 
-## 🔧 Technologies à utiliser
+## Lancer le backend
 
-### Front-end (déjà fourni)
-- **React 19** - UI framework
-- **TypeScript 5.7+** - Typage statique
-- **Vite 6** - Build tool
-- **TailwindCSS 3.4** - Styling
-- **TanStack Query** - Data fetching
-- **React Router 7** - Routing
-- **Axios** - HTTP client
+En développement :
 
-### Back-end (à implémenter par vous)
-- **NestJS 11** - Framework back-end
-- **TypeScript 5.7+** (Strict Mode)
-- **Prisma** - ORM pour MySQL
-- **Passport + JWT** - Authentification
-- **bcrypt** - Chiffrement mots de passe
-- **class-validator** - Validation DTOs
-- **@nestjs/swagger** - Documentation OpenAPI
+```bash
+npm run start:dev
+```
+
+L'API est ensuite disponible sur :
+
+```text
+http://localhost:3001
+```
+
+## Documentation Swagger
+
+La documentation de l'API est accessible ici :
+
+```text
+http://localhost:3001/api-docs
+```
+
+Les routes sont protégées par JWT, sauf :
+
+- la création de compte ;
+- la connexion ;
+- la documentation Swagger.
+
+Pour tester une route protégée dans Swagger :
+
+1. utiliser `POST /api/auth/login` ;
+2. récupérer le token retourné ;
+3. cliquer sur `Authorize` ;
+4. coller uniquement le JWT ;
+5. lancer ensuite les routes protégées.
+
+## Routes principales
+
+### Authentification
+
+```text
+POST /api/auth/register
+POST /api/auth/login
+GET  /api/auth/me
+```
+
+### Locations
+
+```text
+GET  /api/rentals
+GET  /api/rentals/:id
+POST /api/rentals
+PUT  /api/rentals/:id
+```
+
+### Utilisateurs
+
+```text
+GET /api/user/:id
+```
+
+### Messages
+
+```text
+POST /api/messages
+```
+
+## Images
+
+Une image est obligatoire lors de la création d'une location.
+
+Les fichiers sont enregistrés sur le serveur dans :
+
+```text
+/uploads
+```
+
+Formats acceptés :
+
+- JPEG
+- PNG
+- WEBP
+
+Taille maximale :
+
+```text
+5 Mo
+```
+
+Les fichiers reçoivent un nom unique avant leur enregistrement, puis seule l'URL de l'image est stockée en base de données.
+
+## Architecture
+
+Le backend suit une organisation classique NestJS :
+
+```text
+Requête HTTP
+    ↓
+Controller
+    ↓
+Service
+    ↓
+Repository
+    ↓
+Prisma
+    ↓
+MySQL
+```
+
+Les rôles sont volontairement séparés :
+
+- **Controller** : reçoit les requêtes HTTP ;
+- **Service** : contient la logique métier ;
+- **Repository** : gère les accès à la base avec Prisma ;
+- **DTO** : valident et décrivent les données échangées ;
+- **Module** : relie les différents éléments entre eux.
+
+## Sécurité
+
+Quelques points mis en place dans le projet :
+
+- mots de passe hashés avec bcrypt ;
+- authentification avec JWT ;
+- routes protégées globalement avec un Guard NestJS ;
+- données sensibles stockées dans `.env` ;
+- mot de passe utilisateur non renvoyé dans les réponses API ;
+- contrôle du type et de la taille des images envoyées ;
+- validation globale des DTO avec `ValidationPipe`.
+
+## Build
+
+Pour vérifier que le projet compile correctement :
+
+```bash
+npm run build
+```
 
 ## 📚 Ressources
 
 ### Documentation officielle
+
 - [NestJS Documentation](https://docs.nestjs.com/)
 - [Prisma Documentation](https://www.prisma.io/docs/)
 - [Passport JWT Strategy](https://docs.nestjs.com/security/authentication#jwt-functionality)
 - [Swagger/OpenAPI](https://docs.nestjs.com/openapi/introduction)
 
 ### Outils
+
 - [Mockoon](https://mockoon.com/) - Mock API server
 - [MySQL Workbench](https://www.mysql.com/products/workbench/) - Database GUI
 - [Prisma Studio](https://www.prisma.io/studio) - Database browser
 - [Postman](https://www.postman.com/) - API testing
 
-## 🔒 Points d'attention
-
-### Sécurité
-- ✅ JWT obligatoire pour toutes les routes (sauf register, login, swagger)
-- ✅ Mots de passe chiffrés avec bcrypt (jamais en clair)
-- ✅ Variables d'environnement pour credentials BDD (`.env`)
-- ✅ Validation des entrées utilisateur (DTOs + class-validator)
-
-### Architecture
-- ✅ Architecture modulaire NestJS (Controller/Service/Repository)
-- ✅ Utilisation de Prisma (pas de SQL brut)
-- ✅ Séparation des responsabilités (SOLID)
-- ✅ Gestion des erreurs avec Exception Filters
-
-### Upload d'images
-- Les images des locations doivent être uploadées sur le serveur
-- L'URL de l'image est ensuite enregistrée en base de données
-- Utiliser `@UseInterceptors(FileInterceptor())` de NestJS
-
-## 📝 Commandes utiles
-
-### Front-end
-```bash
-cd frontend
-npm install          # Installer les dépendances
-npm run dev          # Lancer en développement
-npm run build        # Build production
-npm run lint         # Vérifier le code
-```
-
-### Back-end (à créer)
-```bash
-# Créer le projet NestJS
-nest new backend
-
-cd backend
-npm install @nestjs/passport passport passport-jwt
-npm install @nestjs/jwt bcrypt
-npm install @prisma/client
-npm install -D prisma
-npm install class-validator class-transformer
-npm install @nestjs/swagger
-
-# Initialiser Prisma
-npx prisma init
-
-# Générer le client Prisma (après configuration schema.prisma)
-npx prisma generate
-
-# Lancer le serveur
-npm run start:dev
-```
-
-## ⚠️ Important
-
-- **Ne PAS modifier le front-end** - Il est déjà complet et fonctionnel
-- Le front-end communique avec l'API sur `http://localhost:3001`
-- Tous les appels API passent par `/api/*`
-- Le front-end attend les mêmes réponses que Mockoon
-
-## 🎓 Bon courage !
-
-Ce projet vous permettra de maîtriser :
-- ✅ L'architecture modulaire avec NestJS
-- ✅ L'authentification JWT
-- ✅ La gestion d'une base de données relationnelle avec Prisma
-- ✅ La documentation d'API avec Swagger
-- ✅ Les bonnes pratiques TypeScript et SOLID
-
----
-
 **Version** : 1.0.0
-**Date** : Janvier 2026
+**Date** : Septembre 2026

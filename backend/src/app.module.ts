@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { RentalsModule } from './rentals/rentals.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -23,6 +24,8 @@ import { RentalsModule } from './rentals/rentals.module';
     AuthModule,
 
     RentalsModule,
+
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

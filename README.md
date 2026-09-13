@@ -1,32 +1,51 @@
-# ChâTop - Portail de Location Saisonnière
+# ChâTop - Portail de location saisonnière
 
-Application full-stack TypeScript pour mettre en relation locataires et propriétaires dans une zone touristique.
+Application full-stack TypeScript permettant de mettre en relation locataires et propriétaires dans une zone touristique.
 
-## 📋 Contexte du projet
+Le projet contient :
 
-Ce repository contient le **front-end React** de l'application ChâTop ainsi que les **ressources nécessaires** pour développer le back-end NestJS.
+- le front-end React fourni avec le projet ;
+- le back-end NestJS développé pour remplacer l'API Mockoon ;
+- les ressources nécessaires à la création de la base de données MySQL.
 
-Votre mission : **Implémenter l'API REST avec NestJS** qui remplacera l'API mockée fournie.
+L'API permet de gérer l'authentification, les locations, les utilisateurs et les messages.
 
-## 🚀 Démarrage rapide
+---
 
-### Prérequis
+## 📋 Stack technique
 
-- **Node.js** 22 LTS ou supérieur
-- **npm** (inclus avec Node.js)
-- **MySQL** 8.0+ (ou MariaDB 10.5+)
-- **Mockoon** Desktop (pour simuler l'API durant le développement front-end)
+### Front-end
 
-### Installation
+- React 19
+- TypeScript
+- Vite
 
-#### 1. Cloner le repository
+### Back-end
+
+- Node.js 22+
+- TypeScript
+- NestJS 11
+- Prisma
+- MySQL
+- Passport / JWT
+- Swagger / OpenAPI
+
+---
+
+## 🚀 Installation
+
+### 1. Cloner le repository
 
 ```bash
 git clone <url-du-repo>
 cd LDJS-Mod-lisez-et-impl-mentez-le-back-end-en-utilisant-du-code-NestJS-maintenable
 ```
 
-#### 2. Installer et lancer le front-end React
+---
+
+### 2. Installer le front-end
+
+Depuis la racine du projet :
 
 ```bash
 cd frontend
@@ -34,32 +53,33 @@ npm install
 npm run dev
 ```
 
-L'application front-end sera accessible sur [http://localhost:5173](http://localhost:5173)
+Le front-end est ensuite accessible sur :
 
-#### 3. Configurer Mockoon
+[http://localhost:5173](http://localhost:5173)
 
-1. Télécharger et installer Mockoon : https://mockoon.com/download/
-2. Ouvrir Mockoon
-3. Importer l'environnement : `File > Open environment`
-4. Sélectionner le fichier : `ressources/mockoon/chatop-api.json`
-5. Démarrer le serveur Mock (clic sur le bouton Play)
+> Le front-end fourni avec le projet n'a pas été modifié.
 
-L'API mockée sera accessible sur [http://localhost:3001](http://localhost:3001)
+---
 
-#### 4. Créer la base de données MySQL
+### 3. Créer la base de données MySQL
+
+Depuis la racine du projet, utiliser le script SQL fourni :
+
+```text
+ressources/sql/schema.sql
+```
+
+Exemple en ligne de commande :
 
 ```bash
 mysql -u root -p < ressources/sql/schema.sql
 ```
 
-Ou via MySQL Workbench / DBeaver :
+Le script peut également être exécuté avec un outil comme MySQL Workbench ou DBeaver.
 
-1. Ouvrir le fichier `ressources/sql/schema.sql`
-2. Exécuter le script
+---
 
-#### 3. Installer et lancer le back-end NestJS
-
-## Installation
+### 4. Installer le back-end
 
 Depuis le dossier `backend` :
 
@@ -67,7 +87,9 @@ Depuis le dossier `backend` :
 npm install
 ```
 
-## Configuration
+---
+
+### 5. Configurer les variables d'environnement
 
 Créer un fichier `.env` à partir du fichier `.env.example`.
 
@@ -81,23 +103,29 @@ PORT=3001
 
 Le fichier `.env` contient les vraies informations de connexion et ne doit pas être versionné.
 
-## Base de données -> Prisma
+---
 
-Une fois la base créée, Prisma peut récupérer sa structure avec :
+### 6. Générer le client Prisma
 
-```bash
-npx prisma db pull
-```
-
-Puis générer le client Prisma :
+Une fois la base de données créée :
 
 ```bash
 npx prisma generate
 ```
 
-## Lancer le backend
+Pendant le développement, la commande suivante a également été utilisée pour récupérer la structure de la base existante :
 
-En développement :
+```bash
+npx prisma db pull
+```
+
+`db pull` permet à Prisma d'introspecter la base de données et de mettre à jour le fichier `schema.prisma`.
+
+---
+
+### 7. Lancer le back-end
+
+En mode développement :
 
 ```bash
 npm run start:dev
@@ -105,17 +133,37 @@ npm run start:dev
 
 L'API est ensuite disponible sur :
 
+[http://localhost:3001](http://localhost:3001)
+
+---
+
+## 🧪 Mockoon
+
+Mockoon a été utilisé au début du projet pour simuler les réponses de l'API avant le développement du back-end NestJS.
+
+Le fichier fourni se trouve dans :
+
 ```text
-http://localhost:3001
+ressources/mockoon/chatop-api.json
 ```
 
-## Documentation Swagger
+Pour l'utiliser :
 
-La documentation de l'API est accessible ici :
+1. ouvrir Mockoon ;
+2. importer l'environnement ;
+3. sélectionner `ressources/mockoon/chatop-api.json` ;
+4. démarrer le serveur Mock.
 
-```text
-http://localhost:3001/api-docs
-```
+> Mockoon et le back-end NestJS utilisent tous les deux le port `3001`.  
+> Il faut donc arrêter Mockoon avant de lancer l'API NestJS sur ce même port.
+
+---
+
+## 📚 Documentation Swagger
+
+La documentation de l'API est disponible ici :
+
+[http://localhost:3001/api-docs](http://localhost:3001/api-docs)
 
 Les routes sont protégées par JWT, sauf :
 
@@ -129,9 +177,11 @@ Pour tester une route protégée dans Swagger :
 2. récupérer le token retourné ;
 3. cliquer sur `Authorize` ;
 4. coller uniquement le JWT ;
-5. lancer ensuite les routes protégées.
+5. tester les routes protégées.
 
-## Routes principales
+---
+
+## 🔗 Routes principales
 
 ### Authentification
 
@@ -162,7 +212,9 @@ GET /api/user/:id
 POST /api/messages
 ```
 
-## Images
+---
+
+## 🖼️ Gestion des images
 
 Une image est obligatoire lors de la création d'une location.
 
@@ -184,11 +236,15 @@ Taille maximale :
 5 Mo
 ```
 
-Les fichiers reçoivent un nom unique avant leur enregistrement, puis seule l'URL de l'image est stockée en base de données.
+Chaque fichier reçoit un nom unique avant son enregistrement afin d'éviter les collisions.
 
-## Architecture
+Seule l'URL de l'image est enregistrée dans la base de données.
 
-Le backend suit une organisation classique NestJS :
+---
+
+## 🏗️ Architecture du back-end
+
+Le projet suit une architecture NestJS organisée par modules.
 
 ```text
 Requête HTTP
@@ -204,49 +260,65 @@ Prisma
 MySQL
 ```
 
-Les rôles sont volontairement séparés :
+Rôle des principaux éléments :
 
-- **Controller** : reçoit les requêtes HTTP ;
+- **Controller** : reçoit les requêtes HTTP et appelle le service ;
 - **Service** : contient la logique métier ;
-- **Repository** : gère les accès à la base avec Prisma ;
+- **Repository** : gère les accès à la base de données avec Prisma ;
 - **DTO** : valident et décrivent les données échangées ;
-- **Module** : relie les différents éléments entre eux.
+- **Module** : relie les différents éléments entre eux grâce à l'injection de dépendances.
 
-## Sécurité
+---
 
-Quelques points mis en place dans le projet :
+## 🔐 Sécurité
+
+Le back-end met en place plusieurs protections :
 
 - mots de passe hashés avec bcrypt ;
 - authentification avec JWT ;
 - routes protégées globalement avec un Guard NestJS ;
-- données sensibles stockées dans `.env` ;
+- variables sensibles stockées dans `.env` ;
 - mot de passe utilisateur non renvoyé dans les réponses API ;
-- contrôle du type et de la taille des images envoyées ;
-- validation globale des DTO avec `ValidationPipe`.
+- validation globale des DTO avec `ValidationPipe` ;
+- contrôle du type des images envoyées ;
+- taille des images limitée à 5 Mo ;
+- nom de fichier généré automatiquement pour les uploads.
 
-## Build
+---
 
-Pour vérifier que le projet compile correctement :
+## ✅ Vérifier le projet
+
+Pour vérifier que le back-end compile correctement :
 
 ```bash
 npm run build
 ```
 
-## 📚 Ressources
+Pour lancer le back-end en développement :
+
+```bash
+npm run start:dev
+```
+
+---
+
+## 📚 Ressources utiles
 
 ### Documentation officielle
 
 - [NestJS Documentation](https://docs.nestjs.com/)
 - [Prisma Documentation](https://www.prisma.io/docs/)
-- [Passport JWT Strategy](https://docs.nestjs.com/security/authentication#jwt-functionality)
-- [Swagger/OpenAPI](https://docs.nestjs.com/openapi/introduction)
+- [Passport / JWT avec NestJS](https://docs.nestjs.com/security/authentication)
+- [Swagger / OpenAPI avec NestJS](https://docs.nestjs.com/openapi/introduction)
 
 ### Outils
 
-- [Mockoon](https://mockoon.com/) - Mock API server
-- [MySQL Workbench](https://www.mysql.com/products/workbench/) - Database GUI
-- [Prisma Studio](https://www.prisma.io/studio) - Database browser
-- [Postman](https://www.postman.com/) - API testing
+- [Mockoon](https://mockoon.com/) - simulation d'API
+- [MySQL Workbench](https://www.mysql.com/products/workbench/) - gestion de la base de données
+- [Prisma Studio](https://www.prisma.io/studio) - visualisation des données
+- [Postman](https://www.postman.com/) - test d'API
 
-**Version** : 1.0.0
-**Date** : Septembre 2026
+---
+
+**Version :** 1.0.0  
+**Date :** Septembre 2026
